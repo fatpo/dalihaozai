@@ -32,6 +32,7 @@ public class WxMaUserController {
     @GetMapping("/login")
     public String login(@PathVariable String appid, String code) {
         if (StringUtils.isBlank(code)) {
+            logger.error("登录参数异常, appid:{}, code:{}", appid, code);
             return "empty jscode";
         }
 
