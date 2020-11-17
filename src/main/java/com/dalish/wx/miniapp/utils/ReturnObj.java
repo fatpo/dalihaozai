@@ -15,4 +15,9 @@ public class ReturnObj<T> {
         this.code = returnCode.getCode();
         this.message = returnCode.getMessage();
     }
+
+    public ReturnObj(Integer code, String message ){
+        this.code = code;
+        this.message = message;
+    }
 }
