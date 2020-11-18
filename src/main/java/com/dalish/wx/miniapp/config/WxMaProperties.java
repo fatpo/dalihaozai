@@ -1,10 +1,9 @@
 package com.dalish.wx.miniapp.config;
 
-import java.util.List;
-
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import lombok.Data;
+import java.util.List;
 
 /**
  * @author <a href="https://github.com/binarywang">Binary Wang</a>

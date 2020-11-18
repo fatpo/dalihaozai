@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
-public class SyncActivityVo {
+public class InsertActivityVo {
     @NotBlank(message = "title is blank")
     private String title;
 

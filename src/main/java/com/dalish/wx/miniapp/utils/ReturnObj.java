@@ -11,18 +11,18 @@ public class ReturnObj<T> {
     private String message;
     private T data;
 
-    public ReturnObj(ReturnCode returnCode){
+    public ReturnObj(ReturnCode returnCode) {
         this.code = returnCode.getCode();
         this.message = returnCode.getMessage();
     }
 
-    public ReturnObj(ReturnCode returnCode, T data){
+    public ReturnObj(ReturnCode returnCode, T data) {
         this.code = returnCode.getCode();
         this.message = returnCode.getMessage();
         this.data = data;
     }
 
-    public ReturnObj(Integer code, String message ){
+    public ReturnObj(Integer code, String message) {
         this.code = code;
         this.message = message;
     }

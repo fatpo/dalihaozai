@@ -39,12 +39,9 @@
                enableCountByExample="true" enableUpdateByExample="true"
                enableDeleteByExample="true" enableSelectByExample="true"
                selectByExampleQueryId="true">
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
 
     </context>
 
 </generatorConfiguration>
-
-    <!--<jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://localhost:3306/mybatis"
-        userId="root" password="helloworld"/> -->
-    <!--<classPathEntry location="E:\apache-maven-repository\mysql\mysql-connector-java\5.1.6\mysql-connector-java-5.1.6.jar"/> -->

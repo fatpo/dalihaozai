@@ -6,7 +6,7 @@ public class LunarSolarConverter {
      * |----4位闰月|-------------13位1为30天，0为29天|
      */
 
-    private static final int[] lunar_month_days = { 1887, 0x1694, 0x16aa, 0x4ad5,
+    private static final int[] lunar_month_days = {1887, 0x1694, 0x16aa, 0x4ad5,
         0xab6, 0xc4b7, 0x4ae, 0xa56, 0xb52a, 0x1d2a, 0xd54, 0x75aa, 0x156a,
         0x1096d, 0x95c, 0x14ae, 0xaa4d, 0x1a4c, 0x1b2a, 0x8d55, 0xad4,
         0x135a, 0x495d, 0x95c, 0xd49b, 0x149a, 0x1a4a, 0xbaa5, 0x16a8,
@@ -34,9 +34,9 @@ public class LunarSolarConverter {
         0xa9b5, 0x96c, 0x14ae, 0x8a4e, 0x1a4c, 0x11d26, 0x1aa4, 0x1b54,
         0xcd6a, 0xada, 0x95c, 0x949d, 0x149a, 0x1a2a, 0x5b25, 0x1aa4,
         0xfb52, 0x16b4, 0xaba, 0xa95b, 0x936, 0x1496, 0x9a4b, 0x154a,
-        0x136a5, 0xda4, 0x15ac };
+        0x136a5, 0xda4, 0x15ac};
 
-    private static final int[] solar_1_1 = { 1887, 0xec04c, 0xec23f, 0xec435, 0xec649,
+    private static final int[] solar_1_1 = {1887, 0xec04c, 0xec23f, 0xec435, 0xec649,
         0xec83e, 0xeca51, 0xecc46, 0xece3a, 0xed04d, 0xed242, 0xed436,
         0xed64a, 0xed83f, 0xeda53, 0xedc48, 0xede3d, 0xee050, 0xee244,
         0xee439, 0xee64d, 0xee842, 0xeea36, 0xeec4a, 0xeee3e, 0xef052,
@@ -69,7 +69,7 @@ public class LunarSolarConverter {
         0x10524a, 0x10543e, 0x105652, 0x105847, 0x105a3b, 0x105c4f,
         0x105e45, 0x106039, 0x10624c, 0x106441, 0x106635, 0x106849,
         0x106a3d, 0x106c51, 0x106e47, 0x10703c, 0x10724f, 0x107444,
-        0x107638, 0x10784c, 0x107a3f, 0x107c53, 0x107e48 };
+        0x107638, 0x10784c, 0x107a3f, 0x107c53, 0x107e48};
 
     private static int GetBitInt(int data, int length, int shift) {
         return (data & (((1 << length) - 1) << shift)) >> shift;
@@ -84,15 +84,14 @@ public class LunarSolarConverter {
     }
 
     /**
-     *
      * @param lunarYear 农历年份
      * @return String of Ganzhi: 甲子年
      * Tiangan:甲乙丙丁戊己庚辛壬癸<br/>Dizhi: 子丑寅卯辰巳无为申酉戌亥
      */
-    public static String lunarYearToGanZhi(int lunarYear){
-        final String[] tianGan = {"甲","乙","丙","丁","戊","己","庚","辛","壬","癸"};
-        final String[] diZhi = {"子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"};
-        return tianGan[(lunarYear-4) % 10]+diZhi[(lunarYear-4) % 12]+"年";
+    public static String lunarYearToGanZhi(int lunarYear) {
+        final String[] tianGan = {"甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"};
+        final String[] diZhi = {"子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"};
+        return tianGan[(lunarYear - 4) % 10] + diZhi[(lunarYear - 4) % 12] + "年";
     }
 
 

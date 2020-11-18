@@ -23,24 +23,47 @@ import java.util.List;
 @Service
 @Slf4j
 public class ActivityService {
-    @Autowired
-    private ActivityMapper activityMapper;
     private static final ThreadLocal<SimpleDateFormat> formatterTl = ThreadLocal
         .withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
+    @Autowired
+    private ActivityMapper activityMapper;
 
-    public void syncActivity(Activity activity) {
+    public int insertActivity(Activity activity) {
         ActivityExample example = new ActivityExample();
         ActivityExample.Criteria c = example.createCriteria();
         String title = activity.getTitle();
         c.andTitleEqualTo(title);
 
-        List<Activity> a = activityMapper.selectByExample(example);
-        if (CollectionUtils.isEmpty(a)) {
+        List<Activity> dbActivities = activityMapper.selectByExample(example);
+        if (CollectionUtils.isEmpty(dbActivities)) {
             log.info("当前数据库无该记录，插入，title: {}", title);
             activityMapper.insert(activity);
+            return activity.getId();
         } else {
-            log.info("当前数据库存在该记录，覆盖，title: {}", title);
-            activityMapper.updateByExampleSelective(activity, example);
+            log.error("当前数据库存在该记录，请检查，title: {}", title);
+            return -1;
+        }
+    }
+
+
+    public boolean updateActivity(Activity activity) {
+        Integer id = activity.getId();
+        Activity dbActivity = activityMapper.selectByPrimaryKey(id);
+        String title = activity.getTitle();
+        if (dbActivity == null) {
+            log.error("更新活动失败，找不到该活动, id: {}, title: {}", id, title);
+            return false;
+        } else {
+            int rows = activityMapper.updateByPrimaryKeySelective(activity);
+            log.error("更新活动id: {}, title: {}, 影响行数:{}", id, title, rows);
+            if (rows == 1) {
+                return true;
+            } else if (rows > 1) {
+                log.error("活动:{} 影响行数异常，请检查活动是否冗余!", title);
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
@@ -56,7 +79,7 @@ public class ActivityService {
 
         // 请求可能带了分类查询
         String category = getActivityVo.getCategory();
-        if (StringUtils.isNotBlank(category)){
+        if (StringUtils.isNotBlank(category)) {
             c.andCategoryEqualTo(category);
         }
 
@@ -69,7 +92,7 @@ public class ActivityService {
 
         // 组装下
         List<GetActivityRspVo> returnActivities = new ArrayList<>();
-        for (Activity activity: activities){
+        for (Activity activity : activities) {
             GetActivityRspVo rspVo = new GetActivityRspVo();
             BeanUtils.copyProperties(activity, rspVo);
             returnActivities.add(rspVo);
