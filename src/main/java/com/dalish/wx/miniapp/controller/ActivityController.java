@@ -1,11 +1,13 @@
 package com.dalish.wx.miniapp.controller;
 
 import com.dalish.wx.miniapp.entity.Activity;
-import com.dalish.wx.miniapp.vo.DeleteActivityVo;
-import com.dalish.wx.miniapp.vo.SyncActivityVo;
 import com.dalish.wx.miniapp.service.ActivityService;
 import com.dalish.wx.miniapp.utils.ReturnCode;
 import com.dalish.wx.miniapp.utils.ReturnObj;
+import com.dalish.wx.miniapp.vo.DeleteActivityVo;
+import com.dalish.wx.miniapp.vo.GetActivityRspVo;
+import com.dalish.wx.miniapp.vo.GetActivityVo;
+import com.dalish.wx.miniapp.vo.SyncActivityVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +85,31 @@ public class ActivityController {
             return new ReturnObj<>(ReturnCode.SERVER_ERROR);
         }finally {
             log.info("删除活动耗时: {}ms", System.currentTimeMillis() - startTime);
+        }
+    }
+
+
+
+    @PostMapping("/get")
+    public ReturnObj<List<GetActivityRspVo>> getActivity(@Valid @RequestBody GetActivityVo activityVo, BindingResult bindingResult) {
+        long startTime = System.currentTimeMillis();
+        log.info("获取活动入参：{}", activityVo);
+
+        if (null != bindingResult && bindingResult.hasErrors()) {
+            List<String> msg = bindingResult.getAllErrors().stream()
+                .map(ObjectError::getDefaultMessage)
+                .collect(Collectors.toList());
+            log.error("获取活动入参异常：{}", msg);
+            return new ReturnObj<>(ReturnCode.PARAM_ERROR.getCode(), msg.toString());
+        }
+        try {
+            List<GetActivityRspVo> activities = activityService.getActivity(activityVo);
+            return new ReturnObj<>(ReturnCode.SUCCESS, activities);
+        }catch (Exception ex){
+            log.error("获取活动异常 {} ", activityVo, ex);
+            return new ReturnObj<>(ReturnCode.SERVER_ERROR);
+        }finally {
+            log.info("获取活动耗时: {}ms", System.currentTimeMillis() - startTime);
         }
     }
 }
