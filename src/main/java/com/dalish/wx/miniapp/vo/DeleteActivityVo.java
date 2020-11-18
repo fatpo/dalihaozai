@@ -2,10 +2,10 @@ package com.dalish.wx.miniapp.vo;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
 public class DeleteActivityVo {
-    @NotBlank(message = "title is blank")
-    private String title;
+    @NotNull(message = "id is null")
+    private Integer id;
 }

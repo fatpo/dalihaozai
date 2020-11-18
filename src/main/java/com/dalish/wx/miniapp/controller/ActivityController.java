@@ -78,7 +78,7 @@ public class ActivityController {
             return new ReturnObj<>(ReturnCode.PARAM_ERROR.getCode(), msg.toString());
         }
         try {
-            activityService.deleteActivity(activityVo.getTitle());
+            activityService.deleteActivity(activityVo.getId());
             return new ReturnObj<>(ReturnCode.SUCCESS);
         }catch (Exception ex){
             log.error("删除活动异常 {} ", activityVo, ex);

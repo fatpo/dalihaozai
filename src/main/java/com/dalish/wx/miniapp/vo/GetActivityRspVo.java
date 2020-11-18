@@ -4,6 +4,8 @@ import lombok.Data;
 
 @Data
 public class GetActivityRspVo {
+    private Integer id;
+
     private String title;
 
     private String linkUrl;

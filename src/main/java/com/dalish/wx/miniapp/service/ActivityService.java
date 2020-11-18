@@ -44,13 +44,9 @@ public class ActivityService {
         }
     }
 
-    public void deleteActivity(String title) {
-        ActivityExample example = new ActivityExample();
-        ActivityExample.Criteria c = example.createCriteria();
-        c.andTitleEqualTo(title);
-
-        int rows = activityMapper.deleteByExample(example);
-        log.info("删除活动，title: {}，删除结果:{}", title, rows);
+    public void deleteActivity(Integer activityId) {
+        int rows = activityMapper.deleteByPrimaryKey(activityId);
+        log.info("删除活动，activityId: {}，删除结果:{}", activityId, rows);
     }
 
 
