@@ -83,6 +83,24 @@ public class ActivityService {
             c.andCategoryEqualTo(category);
         }
 
+        // 请求可能带了地址查询
+        String address = getActivityVo.getAddress();
+        if (StringUtils.isNotBlank(address)) {
+            c.andAddressLike(address);
+        }
+
+        // 请求可能带了价格查询 - min
+        Integer minPrice = getActivityVo.getMinPrice();
+        if (minPrice != null) {
+            c.andPriceGreaterThan(minPrice);
+        }
+
+        // 请求可能带了价格查询 - max
+        Integer maxPrice = getActivityVo.getMaxPrice();
+        if (maxPrice != null) {
+            c.andPriceLessThan(maxPrice);
+        }
+
         // 以开始日期为基准，设置活动范围区间
         c.andStartDateGreaterThanOrEqualTo(getActivityVo.getStartDate());
         c.andStartDateLessThanOrEqualTo(getActivityVo.getEndDate());

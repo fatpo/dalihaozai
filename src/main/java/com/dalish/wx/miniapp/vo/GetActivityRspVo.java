@@ -12,6 +12,10 @@ public class GetActivityRspVo {
 
     private String category;
 
+    private String address;
+
+    private Integer price;
+
     private String startDate;
 
     private String endDate;

@@ -40,6 +40,8 @@
                enableDeleteByExample="true" enableSelectByExample="true"
                selectByExampleQueryId="true">
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+            <columnOverride column="address" javaType="java.lang.String" jdbcType="VARCHAR" />
+            <columnOverride column="detail" javaType="java.lang.String" jdbcType="VARCHAR" />
         </table>
 
     </context>

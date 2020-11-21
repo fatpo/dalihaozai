@@ -14,6 +14,10 @@ public class InsertActivityRspVo {
 
     private String category;
 
+    private String address;
+
+    private Integer price;
+
     private Date startDate;
 
     private Date endDate;

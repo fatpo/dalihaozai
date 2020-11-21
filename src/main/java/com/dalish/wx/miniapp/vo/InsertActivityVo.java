@@ -2,6 +2,7 @@ package com.dalish.wx.miniapp.vo;
 
 import lombok.Data;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -18,6 +19,13 @@ public class InsertActivityVo {
 
     @NotBlank(message = "category is blank")
     private String category;
+
+    @NotBlank(message = "address is blank")
+    private String address;
+
+    @NotNull(message = "price is blank")
+    @Min(value = 1, message = "min price is 1")
+    private Integer price;
 
     @NotNull(message = "startDate is blank")
     private Date startDate;
