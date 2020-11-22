@@ -113,6 +113,28 @@ public class ActivityController {
         }
     }
 
+    @PostMapping("/getByDate")
+    public ReturnObj<List<GetActivityByDateRspVo>> getActivity(@Valid @RequestBody GetActivityByDateVo activityVo, BindingResult bindingResult) {
+        long startTime = System.currentTimeMillis();
+        log.info("根据日期区间获取活动入参：{}", activityVo);
+
+        if (null != bindingResult && bindingResult.hasErrors()) {
+            List<String> msg = bindingResult.getAllErrors().stream()
+                .map(ObjectError::getDefaultMessage)
+                .collect(Collectors.toList());
+            log.error("根据日期区间获取活动入参异常：{}", msg);
+            return new ReturnObj<>(ReturnCode.PARAM_ERROR.getCode(), msg.toString());
+        }
+        try {
+            List<GetActivityByDateRspVo> activities = activityService.getActivityByDate(activityVo);
+            return new ReturnObj<>(ReturnCode.SUCCESS, activities);
+        } catch (Exception ex) {
+            log.error("根据日期区间获取活动异常 {} ", activityVo, ex);
+            return new ReturnObj<>(ReturnCode.SERVER_ERROR);
+        } finally {
+            log.info("根据日期区间获取活动耗时: {}ms", System.currentTimeMillis() - startTime);
+        }
+    }
 
     @PostMapping("/get")
     public ReturnObj<List<GetActivityRspVo>> getActivity(@Valid @RequestBody GetActivityVo activityVo, BindingResult bindingResult) {

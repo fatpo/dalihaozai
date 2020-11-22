@@ -6,6 +6,8 @@ import com.dalish.wx.miniapp.mapper.ActivityMapper;
 import com.dalish.wx.miniapp.utils.Lunar;
 import com.dalish.wx.miniapp.utils.LunarSolarConverter;
 import com.dalish.wx.miniapp.utils.Solar;
+import com.dalish.wx.miniapp.vo.GetActivityByDateRspVo;
+import com.dalish.wx.miniapp.vo.GetActivityByDateVo;
 import com.dalish.wx.miniapp.vo.GetActivityRspVo;
 import com.dalish.wx.miniapp.vo.GetActivityVo;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -111,24 +115,62 @@ public class ActivityService {
         // 组装下
         List<GetActivityRspVo> returnActivities = new ArrayList<>();
         for (Activity activity : activities) {
-            GetActivityRspVo rspVo = new GetActivityRspVo();
-            BeanUtils.copyProperties(activity, rspVo);
+            GetActivityRspVo rspVo = getActivityRspVo(activity);
             returnActivities.add(rspVo);
-
-            // 补充农历起始、结束日期
-            Date startDate = activity.getStartDate();
-            rspVo.setStartDate(formatterTl.get().format(startDate));
-            Date endDate = activity.getEndDate();
-            rspVo.setEndDate(formatterTl.get().format(endDate));
-
-            Solar startDateSolar = new Solar(startDate);
-            Lunar startDateLunar = LunarSolarConverter.SolarToLunar(startDateSolar);
-            rspVo.setLunarStartDate(startDateLunar.toDateStr());
-
-            Solar endDateSolar = new Solar(endDate);
-            Lunar endDateLunar = LunarSolarConverter.SolarToLunar(endDateSolar);
-            rspVo.setLunarEndDate(endDateLunar.toDateStr());
         }
         return returnActivities;
+    }
+
+    public List<GetActivityByDateRspVo> getActivityByDate(GetActivityByDateVo getActivityVo) {
+        ActivityExample example = new ActivityExample();
+        ActivityExample.Criteria c = example.createCriteria();
+
+        // 以开始日期为基准，设置活动范围区间
+        c.andStartDateGreaterThanOrEqualTo(getActivityVo.getStartDate());
+        c.andStartDateLessThanOrEqualTo(getActivityVo.getEndDate());
+
+        List<Activity> dbActivities = activityMapper.selectByExample(example);
+        log.info("获取活动，request param : {}，活动size: {}", getActivityVo, dbActivities.size());
+
+        // 组装下
+        List<GetActivityRspVo> activities = new ArrayList<>();
+        for (Activity activity : dbActivities) {
+            GetActivityRspVo rspVo = getActivityRspVo(activity);
+            activities.add(rspVo);
+        }
+
+        // 按分类组装
+        Map<String, List<GetActivityRspVo>> map = activities.stream()
+            .collect(Collectors.groupingBy(GetActivityRspVo::getCategory));
+
+        List<GetActivityByDateRspVo> rsp = new ArrayList<>();
+        for (Map.Entry<String, List<GetActivityRspVo>> entry : map.entrySet()) {
+            GetActivityByDateRspVo vo = new GetActivityByDateRspVo();
+            vo.setCategory(entry.getKey());
+            vo.setList(entry.getValue());
+            rsp.add(vo);
+        }
+        return rsp;
+    }
+
+    private GetActivityRspVo getActivityRspVo(Activity activity) {
+        GetActivityRspVo rspVo = new GetActivityRspVo();
+        BeanUtils.copyProperties(activity, rspVo);
+
+        // 补充农历起始、结束日期
+        Date startDate = activity.getStartDate();
+        rspVo.setStartDate(formatterTl.get().format(startDate));
+        Date endDate = activity.getEndDate();
+        rspVo.setEndDate(formatterTl.get().format(endDate));
+
+        Solar startDateSolar = new Solar(startDate);
+        Lunar startDateLunar = LunarSolarConverter.SolarToLunar(startDateSolar);
+        rspVo.setLunarStartDate(startDateLunar.toDateStr());
+
+        Solar endDateSolar = new Solar(endDate);
+        Lunar endDateLunar = LunarSolarConverter.SolarToLunar(endDateSolar);
+        rspVo.setLunarEndDate(endDateLunar.toDateStr());
+
+        return rspVo;
     }
 }
