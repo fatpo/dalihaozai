@@ -18,6 +18,10 @@ public class UpdateActivityVo {
 
     private String category;
 
+    private Integer price;
+
+    private String address;
+
     private Date startDate;
 
     private Date endDate;
