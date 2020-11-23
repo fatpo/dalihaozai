@@ -9,13 +9,13 @@
         <version>2.3.0.RELEASE</version>
     </parent>
 
-    <groupId>com.github.binarywang</groupId>
+    <groupId>com.github.fatpo</groupId>
     <version>1.0.0-SNAPSHOT</version>
-    <artifactId>weixin-java-miniapp-demo</artifactId>
+    <artifactId>dalihaozai</artifactId>
     <packaging>jar</packaging>
 
-    <name>spring-boot-demo-for-wechat-miniapp</name>
-    <description>Spring Boot Demo with wechat miniapp</description>
+    <name>dalihaozai</name>
+    <description>wechat miniapp for dalihaozai</description>
 
     <properties>
         <weixin-java-miniapp.version>3.9.4.B</weixin-java-miniapp.version>
