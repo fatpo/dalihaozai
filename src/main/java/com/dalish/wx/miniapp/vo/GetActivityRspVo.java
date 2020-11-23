@@ -27,4 +27,8 @@ public class GetActivityRspVo {
     private String lunarStartDate;
 
     private String lunarEndDate;
+
+    private String dateRange;
+
+    private String timeRange;
 }

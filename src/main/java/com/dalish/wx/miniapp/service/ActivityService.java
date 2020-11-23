@@ -80,45 +80,63 @@ public class ActivityService {
     public List<GetActivityRspVo> getActivity(GetActivityVo getActivityVo) {
         ActivityExample example = new ActivityExample();
         ActivityExample.Criteria c = example.createCriteria();
+        boolean queryFlag = false;
 
         // 请求可能带了分类查询
         String category = getActivityVo.getCategory();
         if (StringUtils.isNotBlank(category)) {
             c.andCategoryEqualTo(category);
+            queryFlag = true;
         }
 
         // 请求可能带了地址查询
         String address = getActivityVo.getAddress();
         if (StringUtils.isNotBlank(address)) {
             c.andAddressLike(address);
+            queryFlag = true;
         }
 
         // 请求可能带了价格查询 - min
         Integer minPrice = getActivityVo.getMinPrice();
         if (minPrice != null) {
             c.andPriceGreaterThan(minPrice);
+            queryFlag = true;
         }
 
         // 请求可能带了价格查询 - max
         Integer maxPrice = getActivityVo.getMaxPrice();
         if (maxPrice != null) {
             c.andPriceLessThan(maxPrice);
+            queryFlag = true;
         }
 
         // 以开始日期为基准，设置活动范围区间
-        c.andStartDateGreaterThanOrEqualTo(getActivityVo.getStartDate());
-        c.andStartDateLessThanOrEqualTo(getActivityVo.getEndDate());
-
-        List<Activity> activities = activityMapper.selectByExample(example);
-        log.info("获取活动，request param : {}，活动size: {}", getActivityVo, activities.size());
-
-        // 组装下
-        List<GetActivityRspVo> returnActivities = new ArrayList<>();
-        for (Activity activity : activities) {
-            GetActivityRspVo rspVo = getActivityRspVo(activity);
-            returnActivities.add(rspVo);
+        Date startDate = getActivityVo.getStartDate();
+        if (startDate != null) {
+            c.andStartDateGreaterThanOrEqualTo(startDate);
+            queryFlag = true;
         }
-        return returnActivities;
+        Date endDate = getActivityVo.getEndDate();
+        if (endDate != null) {
+            c.andStartDateLessThanOrEqualTo(endDate);
+            queryFlag = true;
+        }
+
+        // 如果确实有查询条件
+        if (queryFlag) {
+            List<Activity> activities = activityMapper.selectByExample(example);
+            log.info("获取活动，request param : {}，活动size: {}", getActivityVo, activities.size());
+
+            // 组装下
+            List<GetActivityRspVo> returnActivities = new ArrayList<>();
+            for (Activity activity : activities) {
+                GetActivityRspVo rspVo = getActivityRspVo(activity);
+                returnActivities.add(rspVo);
+            }
+            return returnActivities;
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     public List<GetActivityByDateRspVo> getActivityByDate(GetActivityByDateVo getActivityVo) {
@@ -157,6 +175,7 @@ public class ActivityService {
         GetActivityRspVo rspVo = new GetActivityRspVo();
         BeanUtils.copyProperties(activity, rspVo);
 
+
         // 补充农历起始、结束日期
         Date startDate = activity.getStartDate();
         rspVo.setStartDate(formatterTl.get().format(startDate));
@@ -170,6 +189,10 @@ public class ActivityService {
         Solar endDateSolar = new Solar(endDate);
         Lunar endDateLunar = LunarSolarConverter.SolarToLunar(endDateSolar);
         rspVo.setLunarEndDate(endDateLunar.toDateStr());
+
+        // 给前端 dateRange 和 timeRange
+        rspVo.setDateRange(rspVo.getStartDate() + " - " + rspVo.getEndDate());
+        rspVo.setTimeRange(activity.getStartTime() + " - " + activity.getEndTime());
 
         return rspVo;
     }
