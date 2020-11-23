@@ -2,8 +2,10 @@ package com.dalish.wx.miniapp.controller;
 
 import com.dalish.wx.miniapp.utils.ReturnCode;
 import com.dalish.wx.miniapp.utils.ReturnObj;
+import com.dalish.wx.miniapp.vo.LoginRspVo;
 import com.dalish.wx.miniapp.vo.LoginVo;
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.pqc.crypto.rainbow.RainbowSigner;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +23,7 @@ import java.util.stream.Collectors;
 public class CmsController {
 
     @PostMapping("/login")
-    public ReturnObj<Void> login(@Valid @RequestBody LoginVo loginVo, BindingResult bindingResult) {
+    public ReturnObj<LoginRspVo> login(@Valid @RequestBody LoginVo loginVo, BindingResult bindingResult) {
         long startTime = System.currentTimeMillis();
         log.info("登录入参：{}", loginVo);
 
@@ -33,10 +35,14 @@ public class CmsController {
             return new ReturnObj<>(ReturnCode.PARAM_ERROR.getCode(), msg.toString());
         }
         try {
-            if (loginVo.getName().equals("admin") && loginVo.getPassword().equals("e10adc3949ba59abbe56e057f20f883e")) {
-                return new ReturnObj<>(ReturnCode.SUCCESS);
+            String name = loginVo.getName();
+            if (name.equals("admin") && loginVo.getPassword().equals("e10adc3949ba59abbe56e057f20f883e")) {
+                LoginRspVo rspVo = new LoginRspVo();
+                rspVo.setToken("djfakdjalkfndke1@#!@sdjlk");
+                rspVo.setName(name);
+                return new ReturnObj<>(ReturnCode.SUCCESS, rspVo);
             }
-            log.info("登录 {}, {} 密码错误!", loginVo.getName(), loginVo.getPassword());
+            log.info("登录 {}, {} 密码错误!", name, loginVo.getPassword());
             return new ReturnObj<>(ReturnCode.BUSINESS_ERROR);
         } catch (Exception ex) {
             log.error("登录异常 {} ", loginVo, ex);
