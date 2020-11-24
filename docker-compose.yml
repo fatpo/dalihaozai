@@ -1,0 +1,24 @@
+version: '2.2'
+services:
+    mysql:
+        image: mysql:5.7
+        volumes:
+            - "~/mysql_home/data:/var/lib/mysql"           # 挂载数据目录
+            - "~/mysql_home/config:/etc/mysql/conf.d"      # 挂载配置文件目录
+        environment:
+            - MYSQL_ROOT_PASSWORD=123qwe
+            - MYSQL_USER=root
+            - MYSQL_PASSWORD=123qwe
+        ports:
+            - "3306:3306"
+        expose:
+            - "3306"
+
+    dalihaozai:
+        image: ouyangbro/dalihaozai:latest
+        environment:
+            SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dalihaozai?autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8
+        ports:
+            - "8080:8080"
+        depends_on:
+            - mysql
