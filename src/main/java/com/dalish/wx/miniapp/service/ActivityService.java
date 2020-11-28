@@ -18,10 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -159,12 +156,13 @@ public class ActivityService {
 
         // 按分类组装
         Map<String, List<GetActivityRspVo>> map = activities.stream()
-            .collect(Collectors.groupingBy(GetActivityRspVo::getCategory));
+            .collect(Collectors.groupingBy(GetActivityRspVo::getStartDate));
+        TreeMap<String, List<GetActivityRspVo>> map2 = new TreeMap<>(map);
 
         List<GetActivityByDateRspVo> rsp = new ArrayList<>();
-        for (Map.Entry<String, List<GetActivityRspVo>> entry : map.entrySet()) {
+        for (Map.Entry<String, List<GetActivityRspVo>> entry : map2.entrySet()) {
             GetActivityByDateRspVo vo = new GetActivityByDateRspVo();
-            vo.setCategory(entry.getKey());
+            vo.setDate(entry.getKey());
             vo.setList(entry.getValue());
             rsp.add(vo);
         }
