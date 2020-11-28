@@ -6,8 +6,8 @@ import java.util.List;
 
 @Data
 public class GetCalendarRspVo {
-    Integer year;
-    Integer month;
-    List<List<CalendarVo>> list;
-
+    Integer todayYear;
+    Integer todayMonth;
+    Integer todayDay;
+    List<CalendarMonthVo> monthList;
 }

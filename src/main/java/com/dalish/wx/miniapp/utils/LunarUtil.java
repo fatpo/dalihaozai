@@ -45,7 +45,7 @@ public class LunarUtil {
      * monCyl4:从1900年1月31日以来,闰月数
      * dayCyl5:与1900年1月31日相差的天数,再加40 ?
      *
-     * @param cal
+     * @param cal 日历入参
      */
     public LunarUtil(Calendar cal) {
         @SuppressWarnings("unused")
@@ -174,6 +174,6 @@ public class LunarUtil {
     }
 
     public String toString() {
-        return (leap ? "闰" : "") + chineseNumber[month - 1] + "月" + getChinaDayString(day);
+        return getChinaDayString(day);
     }
 }

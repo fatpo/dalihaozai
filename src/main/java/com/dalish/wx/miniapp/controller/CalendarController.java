@@ -3,6 +3,7 @@ package com.dalish.wx.miniapp.controller;
 import com.dalish.wx.miniapp.service.CalendarService;
 import com.dalish.wx.miniapp.utils.ReturnCode;
 import com.dalish.wx.miniapp.utils.ReturnObj;
+import com.dalish.wx.miniapp.vo.CalendarMonthVo;
 import com.dalish.wx.miniapp.vo.GetCalendarRspVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +22,11 @@ public class CalendarController {
     private CalendarService calendarService;
 
     @GetMapping("/get")
-    public ReturnObj<List<GetCalendarRspVo>> getCalendar() {
+    public ReturnObj<GetCalendarRspVo> getCalendar() {
         long startTime = System.currentTimeMillis();
         log.info("获取日历入参：无");
         try {
-            List<GetCalendarRspVo> rspVo = calendarService.getList();
+            GetCalendarRspVo rspVo = calendarService.getCalendarRspVo();
             return new ReturnObj<>(ReturnCode.SUCCESS, rspVo);
         } catch (Exception ex) {
             log.error("获取日历异常 ", ex);
