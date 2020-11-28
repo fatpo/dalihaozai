@@ -81,7 +81,10 @@ public class ActivityService {
 
         // 请求可能带了分类查询
         String category = getActivityVo.getCategory();
-        if (StringUtils.isNotBlank(category)) {
+        if (category.equals("ALL")){
+            log.info("查询全部分类...");
+            queryFlag = true;
+        }else if (StringUtils.isNotBlank(category)) {
             c.andCategoryEqualTo(category);
             queryFlag = true;
         }
