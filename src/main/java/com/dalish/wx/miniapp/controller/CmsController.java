@@ -47,7 +47,7 @@ public class CmsController {
                 LoginRspVo rspVo = new LoginRspVo();
                 rspVo.setToken("djfakdjalkfndke1@#!@sdjlk");
                 rspVo.setName(name);
-                return new ReturnObj<>(ReturnCode.PASSWORD_ERROR, rspVo);
+                return new ReturnObj<>(ReturnCode.SUCCESS, rspVo);
             }
             log.info("登录 {}, {} 密码错误!", name, password);
             return new ReturnObj<>(ReturnCode.PASSWORD_ERROR);
