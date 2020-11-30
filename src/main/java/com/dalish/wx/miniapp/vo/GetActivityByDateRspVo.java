@@ -7,7 +7,7 @@ import java.util.List;
 @Data
 public class GetActivityByDateRspVo {
 
-    private String category;
+    private String date;
 
     private List<GetActivityRspVo> list;
 

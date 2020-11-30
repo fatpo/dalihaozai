@@ -2,8 +2,10 @@ package com.dalish.wx.miniapp.service;
 
 import com.dalish.wx.miniapp.utils.LunarUtil;
 import com.dalish.wx.miniapp.vo.CalendarVo;
+import com.dalish.wx.miniapp.vo.CalendarMonthVo;
 import com.dalish.wx.miniapp.vo.GetCalendarRspVo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,16 +15,32 @@ import java.util.List;
 @Service
 @Slf4j
 public class CalendarService {
+    @Value("${calendar.monthCnt:2}")
+    int monthCnt;
 
-    public List<GetCalendarRspVo> getList() {
+    public GetCalendarRspVo getCalendarRspVo(){
+        // 组装当天数据
+        GetCalendarRspVo rspVo = new GetCalendarRspVo();
+        Calendar calendar = Calendar.getInstance();
+        rspVo.setTodayYear(calendar.get(Calendar.YEAR));
+        rspVo.setTodayMonth(calendar.get(Calendar.MONTH));
+        rspVo.setTodayDay(calendar.get(Calendar.DATE));
+
+        // 组装每个月数据
+        List<CalendarMonthVo> monthList = getMonthList(monthCnt);
+        rspVo.setMonthList(monthList);
+        return rspVo;
+    }
+
+    private List<CalendarMonthVo> getMonthList(int monthCnt) {
         Calendar calendar = Calendar.getInstance();
         int cnt = 0;
 
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
 
-        List<GetCalendarRspVo> rspVos = new ArrayList<>();
-        while (cnt++ < 6) {
+        List<CalendarMonthVo> rspVos = new ArrayList<>();
+        while (cnt++ < monthCnt) {
             month++;
             if (month == 13) {
                 month = 1;
@@ -30,17 +48,17 @@ public class CalendarService {
             }
 
             log.info("处理{}年，{}月", year, month);
-            GetCalendarRspVo rspVo = new GetCalendarRspVo();
+            CalendarMonthVo rspVo = new CalendarMonthVo();
             rspVo.setYear(year);
             rspVo.setMonth(month);
-            rspVo.setList(printCalender(year, month));
+            rspVo.setWeekList(getWeekList(year, month));
             rspVos.add(rspVo);
         }
         return rspVos;
     }
 
 
-    public List<List<CalendarVo>> printCalender(int year, int month) {
+    public List<List<CalendarVo>> getWeekList(int year, int month) {
         //input
         Calendar calendar = Calendar.getInstance();
         int javaOffset = 1;
@@ -74,6 +92,10 @@ public class CalendarService {
                 rsp.add(new ArrayList<>(tmpRsp));
                 tmpRsp.clear();
             }
+        }
+        // 不足补 7
+        while (tmpRsp.size() < 7){
+            tmpRsp.add(null);
         }
         rsp.add(new ArrayList<>(tmpRsp));
         return rsp;
