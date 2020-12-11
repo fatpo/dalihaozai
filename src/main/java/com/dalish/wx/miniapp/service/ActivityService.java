@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -81,10 +82,10 @@ public class ActivityService {
 
         // 请求可能带了分类查询
         String category = getActivityVo.getCategory();
-        if (category.equals("ALL")){
+        if (category.equals("ALL")) {
             log.info("查询全部分类...");
             queryFlag = true;
-        }else if (StringUtils.isNotBlank(category)) {
+        } else if (StringUtils.isNotBlank(category)) {
             c.andCategoryEqualTo(category);
             queryFlag = true;
         }
@@ -140,14 +141,23 @@ public class ActivityService {
     }
 
     public List<GetActivityByDateRspVo> getActivityByDate(GetActivityByDateVo getActivityVo) {
-        ActivityExample example = new ActivityExample();
-        ActivityExample.Criteria c = example.createCriteria();
+        /*
+        *  select * from activity where
+             (start_date <= "2020-12-01" and end_date >= '2020-12-08')  -- 活动把查询条件包起来
+             or
+             (start_date >= "2020-12-01" and end_date <= '2020-12-08')  -- 活动被查询条件包起来
+             or
+             (start_date <= "2020-12-01" and end_date <= '2020-12-08' and end_date >= '2020-12-01')  -- 活动在查询条件的左边
+             or
+             (start_date >= "2020-12-01" and end_date >= '2020-12-08' and start_date <= '2020-12-08') -- 活动在查询条件的右边 ;
+        * */
 
-        // 以开始日期为基准，设置活动范围区间
-        c.andStartDateGreaterThanOrEqualTo(getActivityVo.getStartDate());
-        c.andStartDateLessThanOrEqualTo(getActivityVo.getEndDate());
+        String pattern = "yyyy-MM-dd";
+        DateFormat df = new SimpleDateFormat(pattern);
 
-        List<Activity> dbActivities = activityMapper.selectByExample(example);
+        List<Activity> dbActivities = activityMapper.selectByDate(
+            df.format(getActivityVo.getStartDate()),
+            df.format(getActivityVo.getEndDate()));
         log.info("获取活动，request param : {}，活动size: {}", getActivityVo, dbActivities.size());
 
         // 组装下
