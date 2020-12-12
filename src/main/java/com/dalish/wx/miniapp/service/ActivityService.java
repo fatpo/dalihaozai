@@ -194,11 +194,6 @@ public class ActivityService {
             list.add(new SimpleDateFormat("yyyy-MM-dd").format(start));
             s += oneDay;
         }
-
-        // 多给一天
-        start = new Date(s);
-        list.add(new SimpleDateFormat("yyyy-MM-dd").format(start));
-
         return list;
     }
 
