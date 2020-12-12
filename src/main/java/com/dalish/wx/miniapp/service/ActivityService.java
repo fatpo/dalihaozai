@@ -143,57 +143,42 @@ public class ActivityService {
         }
     }
 
-    public List<GetActivityByDateRspVo> getActivityByDate(GetActivityByDateVo getActivityVo) {
+    public List<GetActivityByDateRspVo> getActivityByDate(GetActivityByDateVo getActivityVo) throws ParseException {
         // 先看这个区间有多少活动
-        String pattern = "yyyy-MM-dd";
-        DateFormat df = new SimpleDateFormat(pattern);
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        Date startDate = getActivityVo.getStartDate();
+        Date endDate = getActivityVo.getEndDate();
 
-        List<Activity> dbActivities = activityMapper.selectByDate(
-            df.format(getActivityVo.getStartDate()),
-            df.format(getActivityVo.getEndDate()));
+        List<Activity> dbActivities = activityMapper.selectByDate(df.format(startDate), df.format(endDate));
         log.info("获取活动，request param : {}，这个区间有活动列表: {}", getActivityVo, dbActivities);
         if (CollectionUtils.isEmpty(dbActivities)) {
             return new ArrayList<>();
         }
 
-        Date s = dbActivities.get(0).getStartDate();
-        Date e = dbActivities.get(0).getEndDate();
-        for (Activity a : dbActivities) {
-            if (a.getStartDate().before(s)) {
-                s = a.getStartDate();
-            }
-            if (a.getEndDate().after(e)) {
-                e = a.getEndDate();
-            }
-        }
-
         List<GetActivityByDateRspVo> rsp = new ArrayList<>();
-        for (String d : getRangeDate(s, e)) {
-            try {
-                ActivityExample example = new ActivityExample();
-                ActivityExample.Criteria c = example.createCriteria();
-                Date dd = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA).parse(d);
-                c.andStartDateLessThanOrEqualTo(dd);
-                c.andEndDateGreaterThanOrEqualTo(dd);
-                List<Activity> single = activityMapper.selectByExample(example);
-                if (!CollectionUtils.isEmpty(single)) {
-                    GetActivityByDateRspVo r = new GetActivityByDateRspVo();
-                    r.setDate(d);
+        for (String d : getRangeDate(startDate, endDate)) {
+            Date dd = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA).parse(d);
 
-                    // 组装下
-                    List<GetActivityRspVo> activities = new ArrayList<>();
-                    for (Activity a : single) {
-                        GetActivityRspVo rspVo = getActivityRspVo(a);
-                        activities.add(rspVo);
-                    }
-                    r.setList(activities);
-                    rsp.add(r);
+            List<Activity> tmp = new ArrayList<>();
+            for (Activity a : dbActivities) {
+                if ((dd.after(a.getStartDate()) || dd.equals(a.getStartDate()))
+                    && (dd.before(a.getEndDate()) || dd.equals(a.getEndDate()))) {
+                    tmp.add(a);
                 }
-            } catch (ParseException parseException) {
-                parseException.printStackTrace();
+            }
+            if (!CollectionUtils.isEmpty(tmp)) {
+                // 组装下
+                GetActivityByDateRspVo r = new GetActivityByDateRspVo();
+                List<GetActivityRspVo> t = new ArrayList<>();
+                for (Activity a : tmp) {
+                    GetActivityRspVo rspVo = getActivityRspVo(a);
+                    t.add(rspVo);
+                }
+                r.setDate(d);
+                r.setList(t);
+                rsp.add(r);
             }
         }
-
         return rsp;
     }
 
@@ -209,6 +194,11 @@ public class ActivityService {
             list.add(new SimpleDateFormat("yyyy-MM-dd").format(start));
             s += oneDay;
         }
+
+        // 多给一天
+        start = new Date(s);
+        list.add(new SimpleDateFormat("yyyy-MM-dd").format(start));
+
         return list;
     }
 
