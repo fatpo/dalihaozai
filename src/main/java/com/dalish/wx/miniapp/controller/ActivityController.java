@@ -43,6 +43,11 @@ public class ActivityController {
             Activity activity = new Activity();
             BeanUtils.copyProperties(activityVo, activity);
 
+            // 做一些额外的属性处理
+            if (activity.getPrice() == null) {
+                activity.setPrice(0);
+            }
+
             int recordId = activityService.insertActivity(activity);
             if (recordId == -1) {
                 return new ReturnObj<>(ReturnCode.BUSINESS_ERROR);
