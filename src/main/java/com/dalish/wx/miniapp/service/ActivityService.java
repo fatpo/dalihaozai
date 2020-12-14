@@ -17,9 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 @Service
 @Slf4j
@@ -81,10 +85,10 @@ public class ActivityService {
 
         // 请求可能带了分类查询
         String category = getActivityVo.getCategory();
-        if (category.equals("ALL")){
+        if (category.equals("ALL")) {
             log.info("查询全部分类...");
             queryFlag = true;
-        }else if (StringUtils.isNotBlank(category)) {
+        } else if (StringUtils.isNotBlank(category)) {
             c.andCategoryEqualTo(category);
             queryFlag = true;
         }
@@ -139,37 +143,58 @@ public class ActivityService {
         }
     }
 
-    public List<GetActivityByDateRspVo> getActivityByDate(GetActivityByDateVo getActivityVo) {
-        ActivityExample example = new ActivityExample();
-        ActivityExample.Criteria c = example.createCriteria();
+    public List<GetActivityByDateRspVo> getActivityByDate(GetActivityByDateVo getActivityVo) throws ParseException {
+        // 先看这个区间有多少活动
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        Date startDate = getActivityVo.getStartDate();
+        Date endDate = getActivityVo.getEndDate();
 
-        // 以开始日期为基准，设置活动范围区间
-        c.andStartDateGreaterThanOrEqualTo(getActivityVo.getStartDate());
-        c.andStartDateLessThanOrEqualTo(getActivityVo.getEndDate());
-
-        List<Activity> dbActivities = activityMapper.selectByExample(example);
-        log.info("获取活动，request param : {}，活动size: {}", getActivityVo, dbActivities.size());
-
-        // 组装下
-        List<GetActivityRspVo> activities = new ArrayList<>();
-        for (Activity activity : dbActivities) {
-            GetActivityRspVo rspVo = getActivityRspVo(activity);
-            activities.add(rspVo);
+        List<Activity> dbActivities = activityMapper.selectByDate(df.format(startDate), df.format(endDate));
+        log.info("获取活动，request param : {}，这个区间有活动列表: {}", getActivityVo, dbActivities);
+        if (CollectionUtils.isEmpty(dbActivities)) {
+            return new ArrayList<>();
         }
-
-        // 按分类组装
-        Map<String, List<GetActivityRspVo>> map = activities.stream()
-            .collect(Collectors.groupingBy(GetActivityRspVo::getStartDate));
-        TreeMap<String, List<GetActivityRspVo>> map2 = new TreeMap<>(map);
 
         List<GetActivityByDateRspVo> rsp = new ArrayList<>();
-        for (Map.Entry<String, List<GetActivityRspVo>> entry : map2.entrySet()) {
-            GetActivityByDateRspVo vo = new GetActivityByDateRspVo();
-            vo.setDate(entry.getKey());
-            vo.setList(entry.getValue());
-            rsp.add(vo);
+        for (String d : getRangeDate(startDate, endDate)) {
+            Date dd = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA).parse(d);
+
+            List<Activity> tmp = new ArrayList<>();
+            for (Activity a : dbActivities) {
+                if ((dd.after(a.getStartDate()) || dd.equals(a.getStartDate()))
+                    && (dd.before(a.getEndDate()) || dd.equals(a.getEndDate()))) {
+                    tmp.add(a);
+                }
+            }
+            if (!CollectionUtils.isEmpty(tmp)) {
+                // 组装下
+                GetActivityByDateRspVo r = new GetActivityByDateRspVo();
+                List<GetActivityRspVo> t = new ArrayList<>();
+                for (Activity a : tmp) {
+                    GetActivityRspVo rspVo = getActivityRspVo(a);
+                    t.add(rspVo);
+                }
+                r.setDate(d);
+                r.setList(t);
+                rsp.add(r);
+            }
         }
         return rsp;
+    }
+
+    private List<String> getRangeDate(Date start, Date end) {
+        List<String> list = new ArrayList<>();
+        long s = start.getTime();
+        long e = end.getTime();
+
+        long oneDay = 1000 * 60 * 60 * 24L;
+
+        while (s <= e) {
+            start = new Date(s);
+            list.add(new SimpleDateFormat("yyyy-MM-dd").format(start));
+            s += oneDay;
+        }
+        return list;
     }
 
     private GetActivityRspVo getActivityRspVo(Activity activity) {

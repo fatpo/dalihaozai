@@ -1,5 +1,6 @@
 package com.dalish.wx.miniapp.controller;
 
+import com.dalish.wx.miniapp.recall.RecallStrategyContext;
 import com.dalish.wx.miniapp.service.CalendarService;
 import com.dalish.wx.miniapp.utils.ReturnCode;
 import com.dalish.wx.miniapp.utils.ReturnObj;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/calendar")
 @Slf4j
@@ -17,6 +20,7 @@ public class CalendarController {
 
     @Autowired
     private CalendarService calendarService;
+
 
     @GetMapping("/get")
     public ReturnObj<GetCalendarRspVo> getCalendar() {
@@ -33,5 +37,16 @@ public class CalendarController {
         }
     }
 
+    @GetMapping("/getItemCf")
+    public void getItemCf() {
+        List<String> ret = RecallStrategyContext.valueOf("ITEM_CF").recall(new Object());
+        System.out.println(ret);
+    }
+
+    @GetMapping("/getUserCf")
+    public void getUserCf() {
+        List<String> ret = RecallStrategyContext.valueOf("USER_CF").recall(new Object());
+        System.out.println(ret);
+    }
 
 }
